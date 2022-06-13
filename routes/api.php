@@ -18,6 +18,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::Get('/hello', function () {
-    return response()->json([['test' => "this my first api"], ['test' => "this my first api"]]);
-});
+// Route::middleware('auth:sanctum')->Get('/hello', function () {
+//     return response()->json([['test' => "this my first api"], ['test' => "this my first api"]]);
+// });
