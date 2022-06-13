@@ -26,6 +26,6 @@ class Category extends Model
     public function child()
     {
 
-        return $this->hasMany(self::class, 'parent_id', 'id');
+        return $this->hasMany(self::class, 'parent_id', 'id')->with('child');
     }
 }

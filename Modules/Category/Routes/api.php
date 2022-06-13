@@ -20,7 +20,8 @@ use Modules\Category\Http\Controllers\CategoryController;
 // });
 
 Route::group(['prefix' => 'category', 'as' => 'category.'], function () {
-    Route::post('/all', [CategoryController::class, 'index'])->name('all');
+    Route::get('/parent', [CategoryController::class, 'index'])->name('all');
+    Route::get('/child/{parent_id}', [CategoryController::class, 'getchild'])->name('all');
     Route::post('/store', [CategoryController::class, 'store'])->name('store');
     Route::post('/update/{id}', [CategoryController::class, 'update'])->name('update');
     Route::delete('/delete/{id}', [CategoryController::class, 'destroy'])->name('destroy');

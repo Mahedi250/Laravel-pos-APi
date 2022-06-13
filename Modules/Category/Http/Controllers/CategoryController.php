@@ -16,15 +16,18 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return response()->json(Category::whereNull('parent_id')->get());
+        $data = Category::with(['child'])->whereNull('parent_id')->get();
+
+        return response()->json($data);
     }
 
     /**
      * Show the form for creating a new resource.
      * @return Renderable
      */
-    public function create(Request $request)
+    public function getchild($parent_id)
     {
+        return response()->json(Category::where('parent_id', $parent_id)->get());
     }
 
     /**
@@ -42,11 +45,14 @@ class CategoryController extends Controller
         }
 
 
+        $parent_id = isset($request->parent_id) ? $request->parent_id : null;
+
 
         try {
             $Category = new Category();
 
             $Category->name = $request->name;
+            $Category->parent_id = $parent_id;
             $Category->slug = str_replace(' ', '-', strtolower(trim($request->name)));
             $saved = $Category->save();
             return response()->json(["message" => "Entry saved"], 200);
@@ -96,8 +102,7 @@ class CategoryController extends Controller
             ]);
 
             $slug = str_replace(' ', '-', strtolower(trim($request->name)));
-            $Category = Category::whereNull('parent_id')
-                ->where('id', $id)
+            $Category = Category::where('id', $id)
                 ->update([
                     'name' => $request->name,
                     'slug' => $slug
@@ -121,9 +126,18 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         try {
-            $delete = Category::whereNull('parent_id')->where('id', $id)->delete();
-            if ($delete) {
-                return response()->json(["message" => "Entry deleted succesfully"], 200);
+            $category = Category::with('child')->where('id', $id)->first();
+            if (!$category) {
+                return response()->json(["message" => "Not found any category"], 404);
+            }
+            if (!$category->child->isEmpty()) {
+                return response()->json(["message" => "Some dependenciy category remaining .Remove them first!!!"], 403);
+            } else {
+                //$category = Category::with('child')->where('id', $id)->category();
+                $isdelete = $category->delete();
+                if ($isdelete) {
+                    return response()->json(["message" => "category remove succesfully"], 200);
+                }
             }
         } catch (\Exception $e) {
             return response()->json(['message' => $e], 500);
