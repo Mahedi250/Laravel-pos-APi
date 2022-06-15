@@ -33,6 +33,11 @@ Route::post('/login', [UserAuthController::class, 'login'])->name('login');
 
 
 
-Route::middleware('auth:sanctum')->get('/hello', function () {
-    return response()->json([['test' => "this my first api"], ['test' => "this my first api"]]);
+Route::middleware('auth:sanctum')->get('/logout', function () {
+    if (Auth::check()) {
+        $isdelete = Auth::user()->tokens()->where('id', Auth::user()->currentAccessToken()->id)->delete();
+        if ($isdelete) {
+            return response()->json(["message" => Auth::user()->name . " " . "logout succecfully"], 200);
+        }
+    }
 });
